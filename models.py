@@ -74,15 +74,17 @@ class ModelWrapper:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 torch_dtype=(torch.bfloat16 if torch.cuda.is_available() else torch.float32),
+                device_map="auto",
             )
         if len(self.tokenizer) != self.model.get_input_embeddings().weight.shape[0]:
             self.model.resize_token_embeddings(len(self.tokenizer))
-        self.model.to(device)
+        # self.model.to(device) 
         self.model.eval()
         if hasattr(self.model.config, "use_cache"):
             self.model.config.use_cache = True
         if self.latent_space_realign:
             self._ensure_latent_realign_matrix(self.model, self.device, args)
+        self.device = next(self.model.parameters()).device
 
     def render_chat(self, messages: List[Dict], add_generation_prompt: bool = True) -> str:
         tpl = getattr(self.tokenizer, "chat_template", None)
