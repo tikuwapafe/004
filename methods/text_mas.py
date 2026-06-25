@@ -152,7 +152,7 @@ class TextMASMethod:
                     gold_int = int(gold)
                     ok = (pred_int == gold_int)
                     error_msg = None
-                except ValueError:
+                except (ValueError, TypeError):
                     ok = False
                     error_msg = f'Value error in parsing answer. Pred: {pred}, Gold: {gold}'
 
