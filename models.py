@@ -51,6 +51,7 @@ class ModelWrapper:
             else:
                 self.vllm_engine = LLM(model=model_name, tensor_parallel_size=tp_size, gpu_memory_utilization=gpu_util)
             self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+            self.tokenizer.padding_side = "left"
             
             use_second_hf = bool(getattr(args, "use_second_HF_model", False)) if args else False
             if use_second_hf:
@@ -69,6 +70,7 @@ class ModelWrapper:
 
         # fallback: normal transformers path
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+        self.tokenizer.padding_side = "left"
         _ensure_pad_token(self.tokenizer)
         with torch.no_grad():
             self.model = AutoModelForCausalLM.from_pretrained(
